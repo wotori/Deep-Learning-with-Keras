@@ -4,7 +4,8 @@ from keras.models import Sequential
 from keras.layers.core import Activation, Dense, Flatten
 from keras.layers.convolutional import Conv2D
 from keras.optimizers import Adam
-from scipy.misc import imresize
+#from scipy.misc import imresize
+from PIL import Image
 import collections
 import numpy as np
 import os
@@ -12,10 +13,11 @@ import os
 import wrapped_game
 
 def preprocess_images(images):
+    x_t = images[0]
     if images.shape[0] < 4:
         # single image
-        x_t = images[0]
-        x_t = imresize(x_t, (80, 80))
+        # x_t = imresize(x_t, (80, 80))
+        x_t = np.resize(x_t, (80, 80))
         x_t = x_t.astype("float")
         x_t /= 255.0
         s_t = np.stack((x_t, x_t, x_t, x_t), axis=2)
@@ -23,7 +25,8 @@ def preprocess_images(images):
         # 4 images
         xt_list = []
         for i in range(images.shape[0]):
-            x_t = imresize(images[i], (80, 80))
+            # x_t = imresize(images[i], (80, 80))
+            x_t = np.resize(x_t, (80, 80))
             x_t = x_t.astype("float")
             x_t /= 255.0
             xt_list.append(x_t)
@@ -54,7 +57,7 @@ def get_next_batch(experience, model, num_actions, gamma, batch_size):
 ############################# main ###############################
 
 # initialize parameters
-DATA_DIR = "../data"
+DATA_DIR = "data"
 NUM_ACTIONS = 3 # number of valid actions (left, stay, right)
 GAMMA = 0.99 # decay rate of past observations
 INITIAL_EPSILON = 0.1 # starting value of epsilon
@@ -86,7 +89,7 @@ model.add(Dense(512, kernel_initializer="normal"))
 model.add(Activation("relu"))
 model.add(Dense(3, kernel_initializer="normal"))
 
-model.compile(optimizer=Adam(lr=1e-6), loss="mse")
+model.compile(optimizer=Adam(learning_rate=1e-6), loss="mse")
 
 # train network
 game = wrapped_game.MyWrappedGame()
@@ -138,8 +141,8 @@ for e in range(NUM_EPOCHS):
         
     print("Epoch {:04d}/{:d} | Loss {:.5f} | Win Count: {:d}"
           .format(e + 1, NUM_EPOCHS, loss, num_wins))
-    fout.write("{:04d}\t{:.5f}\t{:d}\n"
-          .format(e + 1, loss, num_wins))
+    fout.write(bytes("{:04d}\t{:.5f}\t{:d}\n"
+          .format(e + 1, loss, num_wins), "utf-8"))
 
     if e % 100 == 0:
         model.save(os.path.join(DATA_DIR, "rl-network.h5"), overwrite=True)

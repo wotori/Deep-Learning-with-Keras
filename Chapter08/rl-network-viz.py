@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-DATA_DIR = "../data"
+DATA_DIR = "data"
 
 xs, loss_ys, wins_ys = [], [], []
 fin = open(os.path.join(DATA_DIR, "rl-network-results-5100.tsv"), "rb")
