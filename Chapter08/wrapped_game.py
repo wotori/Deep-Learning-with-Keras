@@ -106,8 +106,7 @@ class MyWrappedGame(object):
         pygame.display.flip()
             
         # save last 4 frames
-        # self.frames.append(pygame.surfarray.array2d(self.screen))
-        self.frames.append(pygame.surfarray.array2d(pygame.Surface((80, 80))))
+        self.frames.append(pygame.surfarray.array2d(self.screen))
         
         if self.num_tries >= self.MAX_TRIES_PER_GAME:
             self.game_over = True

@@ -4,7 +4,6 @@ from keras.models import Sequential
 from keras.layers.core import Activation, Dense, Flatten
 from keras.layers.convolutional import Conv2D
 from keras.optimizers import Adam
-#from scipy.misc import imresize
 from PIL import Image
 import collections
 import numpy as np
@@ -13,22 +12,24 @@ import os
 import wrapped_game
 
 def preprocess_images(images):
-    x_t = images[0]
     if images.shape[0] < 4:
         # single image
-        # x_t = imresize(x_t, (80, 80))
-        x_t = np.resize(x_t, (80, 80))
-        x_t = x_t.astype("float")
-        x_t /= 255.0
+        x_t = images[0]
+        game_img = Image.fromarray(x_t)
+        game_img = game_img.resize((80, 80), Image.Resampling.BOX)
+        x_t = np.asarray(game_img)
+        x_t = (x_t / 65536) / 256
+        x_t = abs(x_t.astype("float").round(1))
         s_t = np.stack((x_t, x_t, x_t, x_t), axis=2)
     else:
         # 4 images
         xt_list = []
         for i in range(images.shape[0]):
-            # x_t = imresize(images[i], (80, 80))
-            x_t = np.resize(x_t, (80, 80))
-            x_t = x_t.astype("float")
-            x_t /= 255.0
+            game_img = Image.fromarray(images[i])
+            game_img = game_img.resize((80, 80), Image.Resampling.BOX)
+            x_t = np.asarray(game_img)
+            x_t = (x_t / 65536) / 256
+            x_t = abs(x_t.astype("float").round(1))
             xt_list.append(x_t)
         s_t = np.stack((xt_list[0], xt_list[1], xt_list[2], xt_list[3]), 
                        axis=2)
