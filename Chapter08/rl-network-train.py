@@ -139,11 +139,13 @@ for e in range(NUM_EPOCHS):
     # reduce epsilon gradually
     if epsilon > FINAL_EPSILON:
         epsilon -= (INITIAL_EPSILON - FINAL_EPSILON) / NUM_EPOCHS
-        
-    print("Epoch {:04d}/{:d} | Loss {:.5f} | Win Count: {:d}"
-          .format(e + 1, NUM_EPOCHS, loss, num_wins))
+    
+    msg = "Epoch {:04d}/{:d} | Loss {:.5f} | Win Count: {:d}".format(e + 1, NUM_EPOCHS, loss, num_wins)
+    print(msg)
     fout.write(bytes("{:04d}\t{:.5f}\t{:d}\n"
           .format(e + 1, loss, num_wins), "utf-8"))
+    with open("step.txt", "w") as file:
+        file.write(msg)
 
     if e % 100 == 0:
         model.save(os.path.join(DATA_DIR, "rl-network.h5"), overwrite=True)
